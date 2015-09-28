@@ -51,6 +51,13 @@ void MainWindow::on_portnum_activated(const QString &arg1)
         {
             ui->portnum->insertItem(0, info.systemLocation());
             ui->portnum->setCurrentIndex(0);
+
+            QString s = info.description() + tr(" ") + info.manufacturer() + tr(" ")
+                   + tr("VID:") + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString())
+                   + tr(" ") + tr("PID:")
+                   + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16): QString());
+
+           ui->statusBar->showMessage(s);
         }
 
         if(info.systemLocation() == arg1)
@@ -135,7 +142,7 @@ void MainWindow::on_pushButton_clicked()
     }
 
    if(!serialPort.open(QIODevice::ReadWrite))
-       ui->statusBar->showMessage( tr("%1打开失败, error: %2").arg(serialPort.portName()).arg(serialPort.errorString()));
+       ui->statusBar->showMessage( tr("%1打开失败, 错误原因: %2").arg(serialPort.portName()).arg(serialPort.errorString()));
    else
        ui->statusBar->showMessage(tr("串口%1打开成功").arg((serialPort.portName())));
 }
