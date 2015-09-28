@@ -33,7 +33,8 @@ void MainWindow::serialInfoUpdate(void)
 {
     foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
     {
-        ui->portnum->addItem(info.systemLocation());
+        ui->portnum->insertItem(0, info.systemLocation());
+        ui->portnum->setCurrentIndex(0);
     }
 }
 
@@ -42,10 +43,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_portnum_highlighted(const QString &arg1)
+void MainWindow::on_portnum_activated(const QString &arg1)
 {
-     foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
+    foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
     {
+        if(ui->portnum->findText(info.systemLocation()) == -1)
+        {
+            ui->portnum->insertItem(0, info.systemLocation());
+            ui->portnum->setCurrentIndex(0);
+        }
+
         if(info.systemLocation() == arg1)
         {
            QString s = info.description() + tr(" ") + info.manufacturer() + tr(" ")

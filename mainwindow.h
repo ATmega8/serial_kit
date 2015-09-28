@@ -30,7 +30,7 @@ public:
 
 
 private slots:
-    void on_portnum_highlighted(const QString &arg1);
+    //void on_portnum_clicked(const QString &arg1);
 
     void on_pushButton_clicked();
 
@@ -49,6 +49,8 @@ private slots:
     void on_pushButton_2_clicked();
 
     void on_pushButton_6_clicked();
+
+    void on_portnum_activated(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;
