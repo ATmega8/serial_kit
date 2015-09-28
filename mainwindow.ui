@@ -144,6 +144,11 @@
       <height>30</height>
      </rect>
     </property>
+    <item>
+     <property name="text">
+      <string>无可用设备</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
