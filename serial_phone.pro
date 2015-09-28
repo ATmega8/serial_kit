@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui serialport multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,8 +13,20 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    framedialog.cpp \
+    frameconfigure.cpp \
+    framestatemachine.cpp \
+    audio_output.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    framedialog.h \
+    frameconfigure.h \
+    framestatemachine.h \
+    audio_output.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    framedialog.ui
+
+DISTFILES += \
+    README.md
