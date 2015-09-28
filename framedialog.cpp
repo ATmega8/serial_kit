@@ -107,3 +107,11 @@ void FrameDialog::on_buttonBox_accepted()
 
     frameConfig.setFrameLen(ui->fl->text().toUInt());
 }
+
+void FrameDialog::on_dt_currentIndexChanged(int index)
+{
+   if(index == 5)
+       ui->dl->setDisabled(true);
+   else
+       ui->dl->setDisabled(false);
+}
