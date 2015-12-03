@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
-    <height>213</height>
+    <width>487</width>
+    <height>161</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>130</x>
       <y>30</y>
-      <width>69</width>
+      <width>71</width>
       <height>30</height>
      </rect>
     </property>
@@ -29,7 +29,7 @@
      <rect>
       <x>210</x>
       <y>30</y>
-      <width>69</width>
+      <width>71</width>
       <height>30</height>
      </rect>
     </property>
@@ -101,7 +101,7 @@
      <rect>
       <x>10</x>
       <y>70</y>
-      <width>85</width>
+      <width>111</width>
       <height>30</height>
      </rect>
     </property>
@@ -112,27 +112,14 @@
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>210</x>
       <y>70</y>
-      <width>85</width>
+      <width>71</width>
       <height>30</height>
      </rect>
     </property>
     <property name="text">
      <string>帧格式</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_3">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>70</y>
-      <width>85</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>停止</string>
     </property>
    </widget>
    <widget class="QComboBox" name="portnum">
@@ -166,9 +153,9 @@
    <widget class="QPushButton" name="pushButton_4">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>130</x>
       <y>70</y>
-      <width>85</width>
+      <width>71</width>
       <height>30</height>
      </rect>
     </property>
@@ -176,61 +163,12 @@
      <string>文件</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>120</y>
-      <width>341</width>
-      <height>30</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_5">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>120</y>
-      <width>85</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>发送</string>
-    </property>
-   </widget>
-   <widget class="Line" name="line">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>100</y>
-      <width>521</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>120</y>
-      <width>51</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>HEX</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pushButton_6">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>290</x>
       <y>70</y>
-      <width>85</width>
+      <width>71</width>
       <height>30</height>
      </rect>
     </property>
@@ -288,17 +226,17 @@
      </property>
     </item>
    </widget>
-   <widget class="QCheckBox" name="checkBox_2">
+   <widget class="QPushButton" name="pushButton_5">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>367</x>
       <y>70</y>
-      <width>51</width>
-      <height>30</height>
+      <width>111</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>播放</string>
+     <string>stop</string>
     </property>
    </widget>
   </widget>
@@ -307,8 +245,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>519</width>
-     <height>23</height>
+     <width>487</width>
+     <height>19</height>
     </rect>
    </property>
   </widget>
