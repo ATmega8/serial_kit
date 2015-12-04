@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->stopbits->addItem(tr("1 Bit"));
     ui->stopbits->addItem(tr("2 Bits"));
 
+    /*audio device init*/
+
     connect(&serialPort, SIGNAL(readyRead()), SLOT(serialReader()));
     connect(&serialPort, SIGNAL(error(QSerialPort::SerialPortError)), SLOT(serialErrorHandler(QSerialPort::SerialPortError)));
     connect(&serial_timer, SIGNAL(timeout()), SLOT(serialTimeHandler()));
@@ -176,10 +178,15 @@ void MainWindow::serialReader(void)
        frameSM->FrameStateMachineDispatch(&m_state, 0);
 
        if(m_state.dataType != FrameConfigure::FrameRawDate)
+       {
             receiveFile.write(m_state.res.toStdString().data());
+
+       }
        else
        {
-            receiveFile.write(m_state.frameBuff);
+            buf.setData(m_state.frameBuff);
+            buf.open(QIODevice::ReadWrite);
+            w.play(&buf);
        }
 
        frameSM->FrameStateMachineUpdateInfo(&m_state);
@@ -196,57 +203,9 @@ void MainWindow::serialTimeHandler(void)
 
 }
 
-void MainWindow::on_pushButton_3_clicked()
-{
-    QString fileName;
-
-    serialPort.close();
-    receiveFile.close();
-
-    fileName = receiveFile.fileName();
-
-    ui->statusBar->showMessage(tr("串口已关闭"));
-
-    if(ui->checkBox_2->isChecked())
-    {
-       w.play(fileName);
-    }
-    else
-        receiveFile.close();
-}
-
 void MainWindow::on_pushButton_5_clicked()
 {
-    QString hexBuff;
-    int i = 0;
-    char sendData;
-    bool ok;
 
-    if(!ui->checkBox->isChecked())
-    {
-        if(serialPort.write(ui->lineEdit_2->text().toStdString().data(),  ui->lineEdit_2->text().length()) < 0 )
-            ui->statusBar->showMessage(tr("wirte serial error"));
-        else
-            ui->statusBar->showMessage(tr("wirte serial succeed"));
-     }
-    else
-    {
-        hexBuff = ui->lineEdit_2->text();
-
-        for(i = 0; i < hexBuff.length()/2; i++)
-        {
-            sendData = (QString(hexBuff[2*i]) + QString(hexBuff[2*i+1])).toUInt(&ok, 16);
-
-            if(ok)
-                serialPort.write(&sendData, 1);
-            else
-            {
-                ui->statusBar->showMessage(tr("convert error"));
-                return;
-            }
-        }
-             ui->statusBar->showMessage(tr("wirte serial succeed"));
-    }
 }
 
 void MainWindow::on_pushButton_2_clicked()

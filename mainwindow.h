@@ -28,10 +28,7 @@ public:
 
     void serialInfoUpdate(void);
 
-
 private slots:
-    //void on_portnum_clicked(const QString &arg1);
-
     void on_pushButton_clicked();
 
     void on_pushButton_4_clicked();
@@ -41,8 +38,6 @@ private slots:
     void serialErrorHandler(QSerialPort::SerialPortError error);
 
     void serialTimeHandler(void);
-
-    void on_pushButton_3_clicked();
 
     void on_pushButton_5_clicked();
 
@@ -64,6 +59,8 @@ private:
     FrameStateMachine* frameSM;
     FrameStateMachine::FrameStateTypeDef m_state;
     audio_output w;
+    QBuffer buf;
+    QAudioOutput* audio;
 };
 
 #endif // MAINWINDOW_H

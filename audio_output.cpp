@@ -5,11 +5,9 @@ audio_output::audio_output(QObject *parent) : QObject(parent)
 
 }
 
-void audio_output::play(QString fileName)
+void audio_output::play(QBuffer* buffer)
 {
-    sourcerFile.setFileName(fileName);
-    sourcerFile.open(QIODevice::ReadOnly);
-
+    source = buffer;
     QAudioFormat format;
     format.setSampleRate(8000);
     format.setChannelCount(1);
@@ -28,7 +26,7 @@ void audio_output::play(QString fileName)
 
     audio = new QAudioOutput(format, this);
     connect(audio, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChangedHandler(QAudio::State)));
-    audio->start(&sourcerFile);
+    audio->start(buffer);
 }
 
 void audio_output::stateChangedHandler(QAudio::State newState)
@@ -37,7 +35,7 @@ void audio_output::stateChangedHandler(QAudio::State newState)
     {
         case QAudio::IdleState:
             audio->stop();
-            audio_output::sourcerFile.close();
+            audio_output::source->close();
             delete audio;
             break;
 

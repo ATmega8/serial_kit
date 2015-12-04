@@ -12,15 +12,16 @@ class audio_output : public QObject
     Q_OBJECT
 public:
     explicit audio_output(QObject *parent = 0);
-    void play(QString fileName);
+    void play(QBuffer* buffer);
+    QAudioOutput* init(void);
 
 signals:
 
 public slots:
 
 private:
-    QFile sourcerFile;
     QAudioOutput* audio;
+    QBuffer* source;
 
 private slots:
     void stateChangedHandler(QAudio::State newState);
