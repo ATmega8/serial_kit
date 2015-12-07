@@ -17,13 +17,15 @@ SOURCES += main.cpp\
     framedialog.cpp \
     frameconfigure.cpp \
     framestatemachine.cpp \
-    audio_output.cpp
+    audio_output.cpp \
+    audio_thread.cpp
 
 HEADERS  += mainwindow.h \
     framedialog.h \
     frameconfigure.h \
     framestatemachine.h \
-    audio_output.h
+    audio_output.h \
+    audio_thread.h
 
 FORMS    += mainwindow.ui \
     framedialog.ui

@@ -9,10 +9,13 @@
 #include <QFile>
 #include <QTimer>
 #include <QByteArray>
+#include <QStyle>
+#include <QDesktopWidget>
 
 #include "framedialog.h"
 #include "framestatemachine.h"
 #include "audio_output.h"
+#include "audio_thread.h"
 
 namespace Ui {
 class MainWindow;
@@ -47,6 +50,8 @@ private slots:
 
     void on_portnum_activated(const QString &arg1);
 
+    void playAudioData(int bufferIsHalf);
+
 private:
     Ui::MainWindow *ui;
     QSerialPort serialPort;
@@ -55,12 +60,20 @@ private:
     QByteArray serialReadData;
 
     int readCount;
+    int bufferIsHalf;
+    int audioIndex;
 
     FrameStateMachine* frameSM;
     FrameStateMachine::FrameStateTypeDef m_state;
     audio_output w;
-    QBuffer buf;
+    QBuffer audioBuffer1;
+    QBuffer audioBuffer2;
     QAudioOutput* audio;
+
+    audio_thread audioThread;
+
+signals:
+    void audioDataReady(int);
 };
 
 #endif // MAINWINDOW_H

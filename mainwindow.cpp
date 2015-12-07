@@ -1,11 +1,25 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "qmath.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    /*设置窗口居中*/
+        this->setGeometry(
+            QStyle::alignedRect(
+            Qt::LeftToRight,
+            Qt::AlignCenter,
+            this->size(),
+            qApp->desktop()->availableGeometry()
+        )
+    );
+
     readCount = 0;
+    bufferIsHalf = 0;
+    audioIndex = 0;
 
     frameSM = new FrameStateMachine();
     m_state.state = FrameStateMachine::disable;
@@ -23,10 +37,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->stopbits->addItem(tr("2 Bits"));
 
     /*audio device init*/
+    w.init(&audioBuffer1);
+
+    /*audio thread start*/
+    audioThread.startAudioOutput(&audioBuffer2);
 
     connect(&serialPort, SIGNAL(readyRead()), SLOT(serialReader()));
     connect(&serialPort, SIGNAL(error(QSerialPort::SerialPortError)), SLOT(serialErrorHandler(QSerialPort::SerialPortError)));
     connect(&serial_timer, SIGNAL(timeout()), SLOT(serialTimeHandler()));
+    connect(this, SIGNAL(audioDataReady(int)), SLOT(playAudioData(int)));
 
     serialInfoUpdate();
 }
@@ -117,7 +136,7 @@ void MainWindow::on_pushButton_clicked()
         }
     }
 
-//配置奇偶校验
+   //配置奇偶校验
    if(ui->parity->currentText() == tr("N"))
     {
         if(serialPort.setParity(QSerialPort::NoParity) != true)
@@ -184,12 +203,24 @@ void MainWindow::serialReader(void)
        }
        else
        {
-            buf.setData(m_state.frameBuff);
-            buf.open(QIODevice::ReadWrite);
-            w.play(&buf);
+
+
+            audioBuffer1.open(QIODevice::ReadWrite);
+            audioBuffer1.write(m_state.frameBuff);
+            audioBuffer1.close();
+
+            audioIndex++;
+
+            if(audioIndex == 1024)
+            {
+                audioIndex = 0;
+                emit audioDataReady(bufferIsHalf);
+            }
        }
 
        frameSM->FrameStateMachineUpdateInfo(&m_state);
+
+       serialReadData.clear();
     }
 }
 
@@ -218,3 +249,10 @@ void MainWindow::on_pushButton_6_clicked()
    frameSM->FrameStateMachineUpdateInfo(&m_state);
    ui->statusBar->showMessage(tr("开始记录数据..."));
 }
+
+void MainWindow::playAudioData(int bufferIsHalf)
+{
+    bufferIsHalf = w.play(bufferIsHalf);
+}
+
+
