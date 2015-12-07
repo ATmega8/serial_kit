@@ -77,6 +77,9 @@
      <height>29</height>
     </rect>
    </property>
+   <property name="text">
+    <string>46</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="fh2">
    <property name="geometry">
@@ -87,6 +90,9 @@
      <height>29</height>
     </rect>
    </property>
+   <property name="text">
+    <string>B9</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="fh3">
    <property name="geometry">
@@ -96,6 +102,9 @@
      <width>113</width>
      <height>29</height>
     </rect>
+   </property>
+   <property name="text">
+    <string>68</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="fh4">
@@ -117,6 +126,9 @@
      <height>29</height>
     </rect>
    </property>
+   <property name="text">
+    <string>16</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="ft2">
    <property name="geometry">
@@ -136,6 +148,9 @@
      <width>113</width>
      <height>29</height>
     </rect>
+   </property>
+   <property name="text">
+    <string>28</string>
    </property>
   </widget>
   <widget class="Line" name="line">
