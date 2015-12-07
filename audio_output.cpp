@@ -5,9 +5,10 @@ audio_output::audio_output(QObject *parent) : QObject(parent)
 
 }
 
-void audio_output::play(QBuffer* buffer)
+void audio_output::init(QBuffer* buffer)
 {
     source = buffer;
+
     QAudioFormat format;
     format.setSampleRate(8000);
     format.setChannelCount(1);
@@ -26,7 +27,27 @@ void audio_output::play(QBuffer* buffer)
 
     audio = new QAudioOutput(format, this);
     connect(audio, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChangedHandler(QAudio::State)));
-    audio->start(buffer);
+}
+
+int audio_output::play(int bufferIsHalf)
+{
+    source->open(QIODevice::ReadWrite);
+
+    if(bufferIsHalf == 0)
+    {
+        source->seek(0);
+        audio->start(source);
+
+        return 1;
+    }
+    else if(bufferIsHalf == 1)
+    {
+        source->seek(16384);
+        audio->start(source);
+
+        return 0;
+    }
+
 }
 
 void audio_output::stateChangedHandler(QAudio::State newState)
@@ -36,7 +57,7 @@ void audio_output::stateChangedHandler(QAudio::State newState)
         case QAudio::IdleState:
             audio->stop();
             audio_output::source->close();
-            delete audio;
+            //delete audio;
             break;
 
         case QAudio::StoppedState:
