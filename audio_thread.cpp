@@ -11,9 +11,12 @@ audio_thread::~audio_thread()
     wait();
 }
 
-void audio_thread::startAudioOutput(QBuffer* audioBuffer)
+void audio_thread::startAudioOutput(QBuffer* buffer)
 {
-    (void)audioBuffer;
+    /*Audio Device Init*/
+    audio.init();
+    buf = buffer;
+
     start(QThread::LowPriority);
 
     qDebug("audio output thread started\n");
@@ -23,8 +26,6 @@ void audio_thread::run()
 {
     qDebug("audio output is running\n");
 
-    while(1)
-    {
 
-    }
+    audio.play(buf);
 }

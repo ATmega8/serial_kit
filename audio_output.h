@@ -12,15 +12,16 @@ class audio_output : public QObject
     Q_OBJECT
 public:
     explicit audio_output(QObject *parent = 0);
-    int play(int bufferIsHalf);
-    void init(QBuffer* buffer);
+    void play(QBuffer* buffer);
+    void init(void);
+
+    QAudioOutput* audio;
 
 signals:
 
 public slots:
 
 private:
-    QAudioOutput* audio;
     QBuffer* source;
 
 private slots:
