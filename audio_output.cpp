@@ -1,13 +1,15 @@
 #include "audio_output.h"
 #include "mainwindow.h"
 
-audio_output::audio_output(QObject *parent) : QObject(parent)
+audio_output::audio_output()
 {
 
 }
 
-void audio_output::init()
+void audio_output::init(QBuffer *buffer)
 {
+    source = buffer;
+
     QAudioFormat format;
     format.setSampleRate(8000);
     format.setChannelCount(1);
@@ -25,12 +27,17 @@ void audio_output::init()
     }
 
     audio = new QAudioOutput(format, this);
-    audio->setBufferSize(28*1024);
-}
+    audio->setBufferSize(BUFFER_SIZE);
 
-void audio_output::play(QBuffer* buffer)
-{
-    source = buffer;
+    connect(audio, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChangedHandler(QAudio::State)));
+
+    qDebug() << "audio output init ok";
+
+    qDebug() << "start play audio buffer";
+
+    qDebug() << "current thread id:" << QThread::currentThreadId();
+
+
     source->open(QIODevice::ReadWrite);
     audio->start(source);
 }
@@ -49,8 +56,9 @@ void audio_output::stateChangedHandler(QAudio::State newState)
         case QAudio::IdleState:
             audio->stop();
             qDebug() << "audio output idle state";
-            //audio_output::source->close();
-            //delete audio;
+            audio_output::source->seek(0);
+            emit finished();
+            delete audio;
             break;
 
         case QAudio::StoppedState:

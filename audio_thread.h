@@ -15,14 +15,13 @@ public:
     audio_thread(QObject* parent = 0);
     ~audio_thread();
 
-    void startAudioOutput(QBuffer *buffer);
-
 protected:
-    void run() Q_DECL_OVERRIDE;
 
 private:
-    audio_output audio;
-    QBuffer* buf;
+
+private slots:
+
+public slots:
 
 signals:
 
