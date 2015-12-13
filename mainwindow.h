@@ -26,18 +26,10 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-typedef enum
-{
-    AudioBuffer_Play,
-    AudioBuffer_ReceiveData,
-    AudioBuffer_Idle
-} AudioBufferStateTypeDef;
-
 typedef struct
 {
     QBuffer buffer;
     int     bufferIndex;
-    AudioBufferStateTypeDef state;
 } AudioBufferTypeDef;
 
 public:
@@ -65,7 +57,7 @@ private slots:
 
     void on_portnum_activated(const QString &arg1);
 
-    void playAudioData(QAudio::State newState);
+    //void playAudioData(QAudio::State newState);
 
 private:
     Ui::MainWindow *ui;
@@ -76,25 +68,25 @@ private:
 
     int readCount;
     int bufferIsHalf;
-    int audioIndex;
 
     FrameStateMachine* frameSM;
     FrameStateMachine::FrameStateTypeDef m_state;
-
-    audio_output w;
 
     AudioBufferTypeDef audioBuffer1;
     AudioBufferTypeDef audioBuffer2;
     AudioBufferTypeDef audioBuffer3;
 
-    int initBuffer;
+    audio_thread* audioThread;
+    audio_output* audioOutput;
+
     int currentBuffer;
 
-    audio_output audioOutput;
-    audio_thread audioThread;
-
-
     void AudioBufferInit(void);
+
+signals:
+    void audioOutputInit(QBuffer* buffer);
+    void bufferChange(QBuffer* buffer);
+    void stateChange(audio_output::OutputStateTypeDef state);
 };
 
 #endif // MAINWINDOW_H

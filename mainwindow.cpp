@@ -16,8 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
     );
 
     readCount = 0;
-    bufferIsHalf = 0;
-    audioIndex = 0;
 
     frameSM = new FrameStateMachine();
     m_state.state = FrameStateMachine::disable;
@@ -41,14 +39,35 @@ MainWindow::MainWindow(QWidget *parent) :
     audioBuffer2.buffer.open(QIODevice::ReadWrite);
     audioBuffer2.bufferIndex = 0;
 
-    initBuffer = 0;
+    audioBuffer3.buffer.open(QIODevice::ReadWrite);
+    audioBuffer3.bufferIndex = 0;
 
-    audioOutput.init();
+    int i;
+
+    QByteArray data = QByteArray();
+    data.append('\0');
+
+    for(i = 0; i < BUFFER_SIZE; i++)
+    {
+        audioBuffer1.buffer.write(data);
+        audioBuffer2.buffer.write(data);
+        audioBuffer3.buffer.write(data);
+    }
+
+    audioBuffer1.buffer.close();
+    audioBuffer2.buffer.close();
+    audioBuffer3.buffer.close();
+
+    audioBuffer1.buffer.open(QIODevice::ReadWrite);
+    audioBuffer2.buffer.open(QIODevice::ReadWrite);
+    audioBuffer3.buffer.open(QIODevice::ReadWrite);
+
+    currentBuffer = 1;
 
     connect(&serialPort, SIGNAL(readyRead()), SLOT(serialReader()));
     connect(&serialPort, SIGNAL(error(QSerialPort::SerialPortError)), SLOT(serialErrorHandler(QSerialPort::SerialPortError)));
     connect(&serial_timer, SIGNAL(timeout()), SLOT(serialTimeHandler()));
-    connect(audioOutput.audio, SIGNAL(stateChanged(QAudio::State)), this, SLOT(playAudioData(QAudio::State)));
+
 
     serialInfoUpdate();
 }
@@ -206,84 +225,106 @@ void MainWindow::serialReader(void)
        }
        else
        {
-            /*写入缓冲文件*/
-
-           if(initBuffer == 0)
+           switch(currentBuffer)
            {
-                audioBuffer1.buffer.write(m_state.frameBuff);
-                audioBuffer1.bufferIndex++;
+               case 1:
+                   audioBuffer1.buffer.write(m_state.frameBuff);
+                   audioBuffer1.bufferIndex++;
 
-                if(audioBuffer1.bufferIndex == 1024)
-                {
-                    audioBuffer1.bufferIndex = 0;
-                    initBuffer = 1;
-                }
+                   if(audioBuffer1.bufferIndex == (BUFFER_SIZE/28))
+                   {
+                       audioBuffer1.bufferIndex = 0;
+                       audioBuffer1.buffer.seek(0);
+                       currentBuffer = 2;
+
+                       audioThread = new audio_thread();
+
+                       qDebug()<<"main thread id = "<<QThread::currentThreadId();
+
+                       audioOutput= new audio_output();
+
+                       audioOutput->moveToThread(audioThread);
+
+                       qDebug() << "1";
+                       qDebug() << "buffer3 size = " << audioBuffer3.buffer.size();
+
+                       connect(this, SIGNAL(audioOutputInit(QBuffer*)), audioOutput, SLOT(init(QBuffer*)), Qt::QueuedConnection);
+                       connect(audioOutput, SIGNAL(finished()), audioThread, SLOT(quit()));
+                       connect(audioOutput, SIGNAL(finished()), audioOutput, SLOT(deleteLater()));
+                       connect(audioThread, SIGNAL(finished()), audioThread, SLOT(deleteLater()));
+
+                       audioThread->start();
+                       emit audioOutputInit(&audioBuffer3.buffer);
+                   }
+
+                   break;
+
+               case 2:
+                   audioBuffer2.buffer.write(m_state.frameBuff);
+                   audioBuffer2.bufferIndex++;
+
+                   if(audioBuffer2.bufferIndex == BUFFER_SIZE/28)
+                   {
+
+                       audioBuffer2.bufferIndex = 0;
+                       audioBuffer2.buffer.seek(0);
+                       currentBuffer = 3;
+
+                       audioOutput = new audio_output();
+                       audioThread = new audio_thread();
+
+                       audioOutput->moveToThread(audioThread);
+
+                       qDebug() << "2";
+                       qDebug() << "buffer1 size = " << audioBuffer1.buffer.size();
+
+                       connect(this, SIGNAL(audioOutputInit(QBuffer*)), audioOutput, SLOT(init(QBuffer*)), Qt::QueuedConnection);
+                       connect(audioOutput, SIGNAL(finished()), audioThread, SLOT(quit()));
+                       connect(audioOutput, SIGNAL(finished()), audioOutput, SLOT(deleteLater()));
+                       connect(audioThread, SIGNAL(finished()), audioThread, SLOT(deleteLater()));
+
+                       audioThread->start();
+                       emit audioOutputInit(&audioBuffer1.buffer);
+                   }
+
+                   break;
+
+              case 3:
+                   audioBuffer3.buffer.write(m_state.frameBuff);
+                   audioBuffer3.bufferIndex++;
+
+                   if(audioBuffer3.bufferIndex == BUFFER_SIZE/28)
+                   {
+
+                        audioBuffer3.bufferIndex = 0;
+                        audioBuffer3.buffer.seek(0);
+                        currentBuffer = 1;
+
+                        audioOutput = new audio_output();
+                        audioThread = new audio_thread();
+
+                        audioOutput->moveToThread(audioThread);
+
+                        qDebug() << "3";
+                        qDebug() << "buffer2 size = " << audioBuffer2.buffer.size();
+
+                        connect(this, SIGNAL(audioOutputInit(QBuffer*)), audioOutput, SLOT(init(QBuffer*)), Qt::QueuedConnection);
+                        connect(audioOutput, SIGNAL(finished()), audioThread, SLOT(quit()));
+                        connect(audioOutput, SIGNAL(finished()), audioOutput, SLOT(deleteLater()));
+                        connect(audioThread, SIGNAL(finished()), audioThread, SLOT(deleteLater()));
+
+                        audioThread->start();
+                        emit audioOutputInit(&audioBuffer2.buffer);
+                   }
+
+                   break;
            }
-           else if(initBuffer == 1)
-           {
-                audioOutput.play(&audioBuffer1.buffer);
-                audioBuffer1.state = AudioBuffer_Play;
-                currentBuffer = 1;
-                initBuffer = 2;
-                qDebug() << "buffer 1 played";
-           }
-           else
-           {
-                switch(currentBuffer)
-                {
-                    case 1:
-                        audioBuffer2.buffer.write(m_state.frameBuff);
-                        audioBuffer2.bufferIndex++;
 
-                        if(audioBuffer2.bufferIndex == 1024)
-                        {
-                            audioBuffer2.bufferIndex = 0;
-                            currentBuffer = 2;
-                        }
-
-                        break;
-
-                    case 2:
-                        audioBuffer1.buffer.write(m_state.frameBuff);
-                        audioBuffer1.bufferIndex++;
-
-                        if(audioBuffer1.bufferIndex == 1024)
-                        {
-                            audioBuffer1.bufferIndex = 0;
-                            currentBuffer = 2;
-                        }
-
-                        break;
-                }
-           }
        }
 
        frameSM->FrameStateMachineUpdateInfo(&m_state);
 
        serialReadData.clear();
-    }
-}
-
-void MainWindow::AudioBufferInit(void)
-{
-    switch(initBuffer)
-    {
-        case 0:
-            audioBuffer1.buffer.write(m_state.frameBuff);
-            audioBuffer1.state = AudioBuffer_Idle;
-            initBuffer = 1;
-            break;
-        case 1:
-            audioBuffer2.buffer.write(m_state.frameBuff);
-            audioBuffer1.state = AudioBuffer_Idle;
-            initBuffer = 2;
-            break;
-
-        /*case 2:
-            audioBuffer3.buffer.write(m_state.frameBuff);
-            audioBuffer1.state = AudioBuffer_Idle;
-            initBuffer = 3;
-            break;*/
     }
 }
 
@@ -313,10 +354,8 @@ void MainWindow::on_pushButton_6_clicked()
    ui->statusBar->showMessage(tr("开始记录数据..."));
 }
 
-void MainWindow::playAudioData(QAudio::State newState)
+/*void MainWindow::playAudioData(QAudio::State newState)
 {
-    int bufferSize;
-
     switch (newState)
     {
         case QAudio::ActiveState:
@@ -331,11 +370,10 @@ void MainWindow::playAudioData(QAudio::State newState)
             switch(currentBuffer)
             {
                 case 1:
-                    audioOutput.play(&audioBuffer2.buffer);
+                    audioOutputplay(&audioBuffer2.buffer);
                     qDebug() << "buffer 1 played";
                     break;
                 case 2:
-                    bufferSize = audioBuffer1.buffer.size();
                     audioOutput.play(&audioBuffer1.buffer);
                     qDebug() << "buffer 2 played";
                     break;
@@ -363,4 +401,4 @@ void MainWindow::playAudioData(QAudio::State newState)
             break;
     }
 
-}
+}*/
